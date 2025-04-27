@@ -1,11 +1,29 @@
 <?php
 require 'layouts/navbar.php';
 
-//index nya pengguna
+// Cek apakah ada pencarian
+$where = "";
+if (isset($_GET['search'])) {
+    $keyword = $_GET['keyword'] ?? '';
+    $tanggal = $_GET['tanggal'] ?? '';
 
+    $whereConditions = [];
+    if (!empty($keyword)) {
+        $whereConditions[] = "nama_maskapai LIKE '%$keyword%'";
+    }
+    if (!empty($tanggal)) {
+        $whereConditions[] = "tanggal_pergi = '$tanggal'";
+    }
+    if (!empty($whereConditions)) {
+        $where = "WHERE " . implode(" AND ", $whereConditions);
+    }
+}
+
+// Query data
 $jadwal = query("SELECT * FROM jadwal_penerbangan 
 INNER JOIN rute ON rute.id_rute = jadwal_penerbangan.id_rute 
 INNER JOIN maskapai ON rute.id_maskapai = maskapai.id_maskapai 
+$where
 ORDER BY tanggal_pergi, waktu_berangkat");
 ?>
 <!-- Banner Slide Full Layar -->
@@ -45,6 +63,16 @@ ORDER BY tanggal_pergi, waktu_berangkat");
     <div class="text-center">
         <h1 class="text-3xl font-bold text-blue-800">Jadwal Penerbangan</h1>
         <hr class="border-blue-400 w-1/4 mx-auto mt-2">
+    </div>
+
+    <!-- Form Search -->
+    <div class="mt-8 flex flex-col md:flex-row items-center justify-center gap-4">
+        <form action="" method="GET" class="flex flex-col md:flex-row items-center gap-4">
+            <input type="text" name="keyword" placeholder="Cari Maskapai" value="<?= htmlspecialchars($_GET['keyword'] ?? '') ?>" class="border border-gray-300 rounded px-4 py-2 w-64">
+            <input type="date" name="tanggal" value="<?= htmlspecialchars($_GET['tanggal'] ?? '') ?>" class="border border-gray-300 rounded px-4 py-2">
+            <button type="submit" name="search" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Cari</button>
+            <a href="index.php" class="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600">Reset</a>
+        </form>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">

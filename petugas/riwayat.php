@@ -1,5 +1,5 @@
 <?php 
-require 'layouts/navbar.php';
+require 'petugas/index.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['id_user'])) {
